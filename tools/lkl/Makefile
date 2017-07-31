@@ -41,10 +41,12 @@ export CFLAGS += -I$(OUTPUT)/include -Iinclude -Wall -g -O2 -Wextra \
 	 -Wno-missing-field-initializers -fno-strict-aliasing
 
 OUTPUT_FORMAT = $(shell $(LD) -r -print-output-format)
+LDFLAGS += -pie
 
 ifneq (,$(filter $(OUTPUT_FORMAT),elf64-x86-64 elf32-i386 elf64-x86-64-freebsd elf32-littlearm elf64-littleaarch64))
   OUTPUT_DEF = $(shell echo | $(CC) -dM -E -)
   CFLAGS   += -fPIC -pthread
+  CFLAGS += -march=armv7-a
   ifeq (,$(filter $(OUTPUT_DEF),__ANDROID__))
     LDLIBS   += -lrt -lpthread
   endif
@@ -106,7 +108,7 @@ $(OUTPUT)liblkl$(SOSUF): LDFLAGS += -shared
 
 $(OUTPUT)liblkl-hijack$(SOSUF): $(OUTPUT)lib/hijack/hijack-in.o $(OUTPUT)liblkl.a
 $(OUTPUT)liblkl-hijack$(SOSUF): LDFLAGS += -shared -nodefaultlibs
-$(OUTPUT)liblkl-hijack$(SOSUF): LDLIBS += -ldl -lc
+$(OUTPUT)liblkl-hijack$(SOSUF): LDLIBS += -ldl -lgcc -lc
 
 $(OUTPUT)lklfuse$(EXESUF): $(OUTPUT)lklfuse-in.o $(OUTPUT)liblkl.a
 $(OUTPUT)lklfuse$(EXESUF): LDLIBS += -lfuse
@@ -126,12 +128,13 @@ endif
 TEST_TARGETS        := test valgrind gdb
 
 $(OUTPUT)tests/boot: $(OUTPUT)tests/boot-in.o $(OUTPUT)liblkl.a
+$(OUTPUT)tests/boot: LDLIBS += -lc
 $(OUTPUT)tests/net-test: $(OUTPUT)tests/net-test-in.o $(OUTPUT)liblkl.a
 $(TEST_TARGETS): $(OUTPUT)tests/boot $(OUTPUT)tests/net-test
 
 # because of libdl, liblkl-hijack will not compile on windows
 # fortunately, the test target will handle a missing libhijack.so correctly
-ifeq (,$(filter $(OUTPUT_FORMAT),pe-i386 elf32-littlearm))
+ifeq (,$(filter $(OUTPUT_FORMAT),pe-i386))
   test: liblkl-hijack$(SOSUF)
 endif
 
@@ -158,9 +161,6 @@ ifneq (,$(filter $(OUTPUT_FORMAT),pe-i386))
   all: $(filter-out $(OUTPUT)liblkl-hijack$(SOSUF), $(ALL_LIBRARIES))
 else ifneq (,$(filter $(OUTPUT_DEF),__ANDROID__))
   all: $(ALL_LIBRARIES)
-#  all: $(filter-out $(OUTPUT)liblkl-hijack$(SOSUF), $(ALL_LIBRARIES))
-#else ifneq (,$(filter $(OUTPUT_FORMAT),elf32-littlearm))
-#  all: $(filter-out $(OUTPUT)liblkl-hijack$(SOSUF), $(ALL_LIBRARIES)) $(ALL_PROGRAMS)
 else
   all: $(ALL_PROGRAMS) $(ALL_LIBRARIES)
 endif
