@@ -224,7 +224,7 @@ int fcntl(int fd, int cmd, ...)
 
 	if (!is_lklfd(fd))
 		return host_fcntl(fd, cmd, arg);
-	return lkl_call(__lkl__NR_fcntl, 3, fd, lkl_fcntl_cmd_xlate(cmd), arg);
+	return lkl_call(__lkl__NR_fcntl64, 3, fd, lkl_fcntl_cmd_xlate(cmd), arg);
 }
 
 HOST_CALL(poll);
