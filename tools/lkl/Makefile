@@ -41,7 +41,7 @@ export CFLAGS += -I$(OUTPUT)/include -Iinclude -Wall -g -O2 -Wextra \
 	 -Wno-missing-field-initializers -fno-strict-aliasing
 
 OUTPUT_FORMAT = $(shell $(LD) -r -print-output-format)
-LD_FLAGS += -pie
+LDFLAGS += -pie
 
 ifneq (,$(filter $(OUTPUT_FORMAT),elf64-x86-64 elf32-i386 elf64-x86-64-freebsd elf32-littlearm elf64-littleaarch64))
   OUTPUT_DEF = $(shell echo | $(CC) -dM -E -)
