@@ -5,7 +5,7 @@ KBUILD_CFLAGS += -fno-builtin
 ifneq (,$(filter $(OUTPUT_FORMAT),elf64-x86-64 elf64-x86-64-freebsd elf64-littleaarch64))
 KBUILD_CFLAGS += -fPIC
 else ifneq (,$(filter $(OUTPUT_FORMAT),elf32-littlearm))
-KBUILD_CFLAGS += -fPIC -march=armv8-a
+KBUILD_CFLAGS += -fPIC -march=armv7-a
 else ifneq (,$(filter $(OUTPUT_FORMAT),pe-i386 pe-x86-64 ))
 ifneq ($(OUTPUT_FORMAT),pe-x86-64)
 prefix=_

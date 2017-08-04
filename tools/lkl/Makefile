@@ -41,6 +41,7 @@ export CFLAGS += -I$(OUTPUT)/include -Iinclude -Wall -g -O2 -Wextra \
 	 -Wno-missing-field-initializers -fno-strict-aliasing
 
 OUTPUT_FORMAT = $(shell $(LD) -r -print-output-format)
+LD_FLAGS += -pie
 
 ifneq (,$(filter $(OUTPUT_FORMAT),elf64-x86-64 elf32-i386 elf64-x86-64-freebsd elf32-littlearm elf64-littleaarch64))
   OUTPUT_DEF = $(shell echo | $(CC) -dM -E -)
@@ -106,7 +107,7 @@ $(OUTPUT)liblkl$(SOSUF): LDFLAGS += -shared
 
 $(OUTPUT)liblkl-hijack$(SOSUF): $(OUTPUT)lib/hijack/hijack-in.o $(OUTPUT)liblkl.a
 $(OUTPUT)liblkl-hijack$(SOSUF): LDFLAGS += -shared -nodefaultlibs
-$(OUTPUT)liblkl-hijack$(SOSUF): LDLIBS += -ldl -lc
+$(OUTPUT)liblkl-hijack$(SOSUF): LDLIBS += -ldl -lgcc -lc
 
 $(OUTPUT)lklfuse$(EXESUF): $(OUTPUT)lklfuse-in.o $(OUTPUT)liblkl.a
 $(OUTPUT)lklfuse$(EXESUF): LDLIBS += -lfuse
@@ -131,7 +132,7 @@ $(TEST_TARGETS): $(OUTPUT)tests/boot $(OUTPUT)tests/net-test
 
 # because of libdl, liblkl-hijack will not compile on windows
 # fortunately, the test target will handle a missing libhijack.so correctly
-ifeq (,$(filter $(OUTPUT_FORMAT),pe-i386 elf32-littlearm))
+ifeq (,$(filter $(OUTPUT_FORMAT),pe-i386))
   test: liblkl-hijack$(SOSUF)
 endif
 
