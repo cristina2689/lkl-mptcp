@@ -1,0 +1,14 @@
+# Builing the 32-bit ARM version for Android
+
+1. Get patched toolchain 
+
+2. Add sysroot 
+
+# or just add a symlink
+cristina@cristina:~/iij/android-ndk-r15b$ cp -r ./platforms/android-24/arch-arm/usr/ ../toolchain/arm-linux-androideabi-4.9/sysroot
+
+3. Use the linaro toolchain from the repo and build lkl. Use the tweaked linker.
+
+4. Link objects using the official linker from the android site. Switch to the official linker
+    
+
