@@ -1,0 +1,15 @@
+Prerequsites to using LKL on Nexus5 (arm32)
+
+* mandatory
+	To suppress TCP RST from host kernel
+	* iptables -A OUTPUT -p tcp --tcp-flags RST RST  -j DROP
+	* because LKL needs to use the same IP address of the cellar interface (rmnet0 on android6), TCP RST should be suppressed.
+	Disable SELinux
+		* setenforce 0 
+		for LD_PRELOAD socket(AF_PACKET) (cap_net_raw required)
+
+
+* optional
+	* default cellular gateway
+	* ip route add 202.214.86.51/32 via ${GATEWAY} table wlan0
+
